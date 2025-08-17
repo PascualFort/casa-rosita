@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Casa Rosita - Presentación</title>
+    <!-- Enlace a Tailwind CSS CDN para un estilo rápido y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración de Tailwind para usar los colores y la fuente Inter -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "rosita-pink": "#FF69B4", // Un rosa vibrante para Casa Rosita
+              "rosita-dark": "#333333", // Un gris oscuro para contraste en fondos claros
+              "rosita-gold": "#FFD700", // Dorado para acentos de cabaret
+              "rosita-light": "#FDF2F8", // Un rosa muy claro para fondos (ej. tabla)
+              "rosita-burlesque-red": "#6B0000", // Nuevo fondo rojo oscuro tipo burlesque
+              "rosita-text-light": "#F8F8F8", // Texto claro para fondos oscuros (solo para el fondo del body)
+            },
+            fontFamily: {
+              inter: ["Inter", "sans-serif"], // Fuente Inter
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Estilos personalizados para un desplazamiento suave */
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Estilo para el cuerpo, con el nuevo fondo rojo oscuro y texto claro por defecto */
+      body {
+        @apply font-inter bg-rosita-burlesque-red text-rosita-text-light;
+      }
+      /* Estilo para los botones de navegación */
+      .nav-button {
+        @apply px-4 py-2 rounded-full transition-all duration-300 ease-in-out hover:bg-rosita-pink hover:text-white shadow-md;
+      }
+      /* Estilo para las tarjetas de contenido (fondos blancos) */
+      .content-card {
+        @apply bg-white p-6 md:p-8 rounded-2xl shadow-xl flex flex-col items-center text-center;
+      }
+      /* Asegura que TODO el texto dentro de las tarjetas blancas sea oscuro y legible */
+      .content-card *, /* Aplica a todos los descendientes */
+        .content-card {
+        /* Aplica a la propia tarjeta */
+        color: theme("colors.rosita-dark");
+      }
+      /* Sobreescribe colores específicos que deben ser rosas */
+      .content-card .subsection-title,
+      .content-card .list-icon {
+        color: theme("colors.rosita-pink");
+      }
+      /* Estilo para los títulos de sección que están dentro de un content-card */
+      .section-title {
+        /* Aumentado el tamaño de fuente para que sean más grandes */
+        @apply text-5xl md:text-6xl font-bold text-center text-rosita-dark; /* Siempre oscuro */
+        margin-bottom: 0; /* Eliminar margen inferior del título si está dentro de content-card */
+      }
+      /* Estilo para los subtítulos dentro de las tarjetas */
+      .subsection-title {
+        @apply text-3xl font-semibold text-rosita-pink mb-4;
+      }
+      /* Estilo para los textos generales dentro de las tarjetas */
+      .text-content {
+        @apply text-lg leading-relaxed; /* Color definido por el selector .content-card * */
+      }
+      /* Estilo para las listas */
+      .list-item {
+        @apply flex items-start mb-3;
+      }
+      .list-icon {
+        @apply text-rosita-pink text-2xl mr-3 flex-shrink-0;
+      }
+      /* Estilo para la tabla de presupuesto */
+      .budget-table {
+        @apply w-full text-left border-collapse;
+      }
+      .budget-table th,
+      .budget-table td {
+        @apply py-3 px-4 border-b border-gray-200;
+      }
+      .budget-table th {
+        @apply bg-rosita-light text-rosita-dark font-semibold;
+      }
+      .budget-table tfoot td {
+        @apply font-bold text-rosita-dark bg-rosita-pink text-white;
+      }
+      /* Estilo para el contenedor de imágenes antes/después */
+      .image-pair {
+        @apply flex flex-col md:flex-row gap-4 justify-center items-center;
+      }
+      .image-pair img {
+        @apply w-full md:w-1/2 rounded-lg shadow-md;
+      }
+
+      /* Estilos para el tooltip del gráfico D3 */
+      .tooltip {
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        pointer-events: none; /* Permite que los eventos de ratón pasen a través del tooltip */
+        position: absolute;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+        color: #333; /* Color de texto oscuro para el tooltip */
+        font-size: 0.9rem;
+        line-height: 1.4;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      /* Asegurar que las etiquetas del gráfico D3 sean blancas */
+      #budget-chart svg text {
+        fill: #ffffff !important; /* Blanco para el texto del gráfico */
+      }
+    </style>
+  </head>
+  <body class="font-inter bg-rosita-burlesque-red text-rosita-text-light">
+    <!-- Barra de navegación fija en la parte superior -->
+    <nav
+      class="fixed top-0 left-0 w-full bg-white bg-opacity-95 shadow-lg z-50 py-4"
+    >
+      <div class="container mx-auto px-4 flex flex-wrap justify-center gap-4">
+        <a href="#inicio" class="nav-button text-rosita-dark">Inicio</a>
+        <a href="#contexto" class="nav-button text-rosita-dark">Contexto</a>
+        <a href="#objetivos" class="nav-button text-rosita-dark">Objetivos</a>
+        <a href="#estrategia" class="nav-button text-rosita-dark">Estrategia</a>
+        <a href="#transformaciones" class="nav-button text-rosita-dark"
+          >Transformaciones</a
+        >
+        <a href="#presupuesto" class="nav-button text-rosita-dark"
+          >Presupuesto</a
+        >
+        <a href="#impacto" class="nav-button text-rosita-dark">Impacto</a>
+      </div>
+    </nav>
+
+    <!-- Sección de Inicio / Cabecera -->
+    <header
+      id="inicio"
+      class="relative flex flex-col items-center justify-center h-screen bg-cover bg-center"
+      style="background-image: url('https://i.imgur.com/ajFerzc.png')"
+    >
+      <!-- Logo/Marca como fondo -->
+      <div class="absolute inset-0 bg-black opacity-60"></div>
+      <div
+        class="relative z-10 text-white text-center p-6 md:p-10 bg-black bg-opacity-50 rounded-2xl shadow-2xl max-w-4xl mx-auto"
+      >
+        <img
+          src="https://i.imgur.com/ajFerzc.png"
+          alt="Logo de Casa Rosita"
+          class="h-32 w-auto mx-auto mb-6 rounded-full border-4 border-rosita-gold shadow-lg"
+        />
+        <!-- Logo más visible -->
+        <h1 class="text-5xl md:text-7xl font-extrabold mb-4 animate-pulse">
+          Casa Rosita
+        </h1>
+        <p class="text-2xl md:text-3xl font-light italic">
+          Espacio Cultural & Bar Escénico en El Sortidors del Parlament
+        </p>
+        <p class="mt-8 text-lg md:text-xl">
+          Un proyecto de revalorización cultural y transformación artística en
+          Barcelona.
+        </p>
+        <a
+          href="#contexto"
+          class="mt-10 inline-block bg-rosita-gold text-rosita-dark font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-500 transition-all duration-300"
+        >
+          Descubre más
+        </a>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-16 mt-20">
+      <!-- Añadido margen superior para evitar que la barra de navegación cubra el contenido -->
+
+      <!-- Sección de Contexto y Justificación -->
+      <section id="contexto" class="mb-20">
+        <div class="content-card mb-8">
+          <!-- Wrapper for the title -->
+          <h2 class="section-title">Contexto y Justificación</h2>
+        </div>
+        <div class="content-card">
+          <!-- Contenido principal en recuadro blanco -->
+          <div class="flex flex-col md:flex-row items-center gap-10">
+            <div class="md:w-1/2">
+              <p class="text-content mb-4">
+                Casa Rosita busca revitalizar el emblemático bar El Sortidors
+                del Parlament en Barcelona, fusionando la experiencia
+                tradicional del bar con el arte escénico alternativo,
+                especialmente el cabaret burlesque.
+              </p>
+              <p class="text-content">
+                Inspirado en la cerveza artesanal "Rosita", el proyecto fomenta
+                el arte independiente, el desarrollo de artistas locales y la
+                dinamización cultural del barrio de Sant Antoni.
+              </p>
+            </div>
+            <div class="md:w-1/2">
+              <img
+                src="https://i.imgur.com/0ZxVWgT.jpeg"
+                alt="Fachada del bar El Sortidors del Parlament"
+                class="rounded-2xl shadow-lg w-full h-auto object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de Objetivos del Proyecto -->
+      <section id="objetivos" class="mb-20">
+        <div class="content-card mb-8">
+          <!-- Wrapper for the title -->
+          <h2 class="section-title">Objetivos del Proyecto</h2>
+        </div>
+        <div class="content-card">
+          <!-- Contenido principal en recuadro blanco -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Cada objetivo es una tarjeta interna, sin sombra ni hover para que el card padre sea el que reaccione -->
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">🎭</span>
+              <h3 class="subsection-title text-xl mt-4">
+                Transformar Infraestructura
+              </h3>
+              <p class="text-content text-base">
+                Incorporar un espacio escénico tipo cabaret.
+              </p>
+            </div>
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">🗓️</span>
+              <h3 class="subsection-title text-xl mt-4">
+                Activar Programación
+              </h3>
+              <p class="text-content text-base">
+                Shows mensuales de burlesque con artistas locales.
+              </p>
+            </div>
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">✨</span>
+              <h3 class="subsection-title text-xl mt-4">
+                Integrar Intervenciones
+              </h3>
+              <p class="text-content text-base">
+                Performance en el bar principal para atraer y fidelizar.
+              </p>
+            </div>
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">🏷️</span>
+              <h3 class="subsection-title text-xl mt-4">Consolidar Marca</h3>
+              <p class="text-content text-base">
+                "Casa Rosita" como sello artístico y moderno barcelonés.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de Estrategia de Implementación -->
+      <section id="estrategia" class="mb-20">
+        <div class="content-card mb-8">
+          <!-- Wrapper for the title -->
+          <h2 class="section-title">Estrategia de Implementación</h2>
+        </div>
+        <div class="content-card">
+          <!-- Contenido principal en recuadro blanco -->
+          <div class="flex flex-col gap-12">
+            <!-- Etapa 1 -->
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <!-- Contenedor de etapa, sin sombra ni hover -->
+              <h3 class="subsection-title">
+                Etapa 1 – Activación preliminar (meses 1 al 6)
+              </h3>
+              <ul class="text-content mb-6 text-left w-full">
+                <!-- Alineación de lista a la izquierda -->
+                <li class="list-item">
+                  <span class="list-icon">✅</span>El bar actual se mantendrá
+                  operativo.
+                </li>
+                <li class="list-item">
+                  <span class="list-icon">✅</span>Intervenciones performáticas
+                  tipo flashmob, 2 veces por semana.
+                </li>
+                <li class="list-item">
+                  <span class="list-icon">✅</span>Mejora visual, iluminación y
+                  branding en la zona principal.
+                </li>
+                <li class="list-item">
+                  <span class="list-icon">✅</span>Inicio de la reforma del
+                  almacén para convertirlo en un cabaret.
+                </li>
+              </ul>
+            </div>
+            <!-- Etapa 2 -->
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <!-- Contenedor de etapa, sin sombra ni hover -->
+              <h3 class="subsection-title">
+                Etapa 2 – Apertura del Cabaret Rosita (meses 7 al 12)
+              </h3>
+              <ul class="text-content mb-6 text-left w-full">
+                <!-- Alineación de lista a la izquierda -->
+                <li class="list-item">
+                  <span class="list-icon">✨</span>Lanzamiento de un show
+                  mensual de burlesque producido internamente.
+                </li>
+                <li class="list-item">
+                  <span class="list-icon">💡</span>Escenario profesional con
+                  luces, sonido e instalación eléctrica adaptada.
+                </li>
+                <li class="list-item">
+                  <span class="list-icon">🛠️</span>Presencia técnica semanal
+                  especializada.
+                </li>
+                <li class="list-item">
+                  <span class="list-icon">🎨</span>Consolidación de la identidad
+                  visual y artística del espacio.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de Transformaciones (Antes y Después) -->
+      <section id="transformaciones" class="mb-20 py-10">
+        <div class="content-card mb-8">
+          <!-- Wrapper for the title -->
+          <h2 class="section-title">Transformaciones del Espacio</h2>
+        </div>
+
+        <div class="content-card">
+          <!-- Contenido principal en recuadro blanco -->
+          <h3 class="subsection-title text-center">
+            Transformaciones de la Etapa 2: Apertura del Cabaret
+          </h3>
+          <p class="text-content text-center mb-6">
+            Descubre cómo el espacio cobra vida con las transformaciones clave
+            para la apertura del Cabaret Rosita.
+          </p>
+
+          <div class="mb-8">
+            <h4 class="text-xl font-semibold text-center mb-4">
+              Transformación 1: Del Almacén al Escenario Principal
+            </h4>
+            <div class="image-pair">
+              <div>
+                <h5 class="text-lg font-semibold text-center mb-2">Antes</h5>
+                <img
+                  src="https://i.imgur.com/fNQbD6P.jpeg"
+                  alt="Almacén antes de la transformación"
+                  class="rounded-2xl shadow-lg w-full h-auto object-cover"
+                />
+              </div>
+              <div>
+                <h5 class="text-lg font-semibold text-center mb-2">Después</h5>
+                <img
+                  src="https://i.imgur.com/v6mT27E.jpeg"
+                  alt="Almacén después de la transformación a cabaret"
+                  class="rounded-2xl shadow-lg w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-xl font-semibold text-center mb-4">
+              Transformación 2: Detalles del Ambiente del Cabaret
+            </h4>
+            <div class="image-pair">
+              <div>
+                <h5 class="text-lg font-semibold text-center mb-2">Antes</h5>
+                <img
+                  src="https://i.imgur.com/jPE5HyA.jpeg"
+                  alt="Espacio antes de los detalles del cabaret"
+                  class="rounded-2xl shadow-lg w-full h-auto object-cover"
+                />
+              </div>
+              <div>
+                <h5 class="text-lg font-semibold text-center mb-2">Después</h5>
+                <img
+                  src="https://i.imgur.com/3h5sYHV.jpeg"
+                  alt="Espacio después de los detalles del cabaret"
+                  class="rounded-2xl shadow-lg w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de Presupuesto Consolidado – Año 1 -->
+      <section id="presupuesto" class="mb-20">
+        <div class="content-card mb-8">
+          <!-- Wrapper for the title -->
+          <h2 class="section-title">Presupuesto Consolidado – Año 1</h2>
+        </div>
+        <div class="content-card">
+          <!-- Contenido principal en recuadro blanco -->
+          <h3 class="subsection-title text-center mb-6">Detalle de Costes</h3>
+          <table class="budget-table mb-8">
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th>Detalle</th>
+                <th>Costo (€)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Reforma del almacén</td>
+                <td>Acondicionamiento estilo cabaret</td>
+                <td>12.500</td>
+              </tr>
+              <tr>
+                <td>Producción artística anual (shows burlesque)</td>
+                <td>Producción, caché artístico, gestión y seguridad social</td>
+                <td>31.944</td>
+              </tr>
+              <tr>
+                <td>Personal técnico – Etapa 1</td>
+                <td>Técnico 1 × 8 h/semana × 26 semanas</td>
+                <td>7.280</td>
+              </tr>
+              <tr>
+                <td>Personal técnico – Etapa 2</td>
+                <td>2 técnicos × 4 h/semana × 26 semanas</td>
+                <td>7.280</td>
+              </tr>
+              <tr>
+                <td>Equipamiento técnico – Cabaret</td>
+                <td>Compra luces y sonido profesional</td>
+                <td>4.500</td>
+              </tr>
+              <tr>
+                <td>Equipamiento técnico – Zona bar</td>
+                <td>Compra luces y sonido básico</td>
+                <td>1.500</td>
+              </tr>
+              <tr>
+                <td>Instalación eléctrica</td>
+                <td>Escenario y parte trasera completa</td>
+                <td>6.500</td>
+              </tr>
+              <tr>
+                <td>Lavado de cara zona bar</td>
+                <td>Iluminación y ambientación mejorada</td>
+                <td>2.000</td>
+              </tr>
+              <tr>
+                <td>Branding Casa Rosita</td>
+                <td>Señalética, gráficas y elementos visuales</td>
+                <td>1.500</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2">TOTAL ESTIMADO PRIMER AÑO</td>
+                <td>74.004</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <h3 class="subsection-title text-center mb-6">
+            Gráfico de Distribución de Costes
+          </h3>
+          <div id="budget-chart" class="flex justify-center w-full">
+            <!-- El gráfico D3.js se renderizará aquí -->
+          </div>
+          <p class="text-center text-sm mt-4">
+            <!-- Asegurar que el texto fuera del content-card sea oscuro si está cerca -->
+            *Todos los costos están en Euros (€).
+          </p>
+        </div>
+      </section>
+
+      <!-- Sección de Impacto Cultural y Social -->
+      <section id="impacto" class="mb-20">
+        <div class="content-card mb-8">
+          <!-- Wrapper for the title -->
+          <h2 class="section-title">Impacto Cultural y Social</h2>
+        </div>
+        <div class="content-card">
+          <!-- Contenido principal en recuadro blanco -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Cada impacto es una tarjeta interna, sin sombra ni hover para que el card padre sea el que reaccione -->
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">🤝</span>
+              <h3 class="subsection-title text-xl mt-4">
+                Participación Artística
+              </h3>
+              <p class="text-content text-base">
+                Abierto a la participación de colectivos artísticos emergentes.
+              </p>
+            </div>
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">🖼️</span>
+              <h3 class="subsection-title text-xl mt-4">Identidad Escénica</h3>
+              <p class="text-content text-base">
+                Estéticamente cuidado y con una identidad escénica clara.
+              </p>
+            </div>
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">🌟</span>
+              <h3 class="subsection-title text-xl mt-4">
+                Recuperación del Valor
+              </h3>
+              <p class="text-content text-base">
+                De la performance y el cabaret contemporáneo.
+              </p>
+            </div>
+            <div class="flex flex-col items-center text-center p-4 rounded-xl">
+              <span class="list-icon">🏙️</span>
+              <h3 class="subsection-title text-xl mt-4">
+                Dinamización Cultural
+              </h3>
+              <p class="text-content text-base">
+                Contribuye a la dinamización cultural de Sant Antoni y el tejido
+                artístico de Barcelona.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-rosita-dark text-white py-8 text-center">
+      <p>&copy; 2025 Casa Rosita. Todos los derechos reservados.</p>
+      <p class="text-sm mt-2">
+        Proyecto de revalorización cultural y transformación artística.
+      </p>
+    </footer>
+
+    <!-- Script para D3.js y el gráfico -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- Código del Gráfico D3.js ---
+        const budgetData = [
+          { category: "Reforma del almacén", cost: 12500 },
+          { category: "Producción artística anual", cost: 31944 },
+          { category: "Personal técnico – Etapa 1", cost: 7280 },
+          { category: "Personal técnico – Etapa 2", cost: 7280 },
+          { category: "Equipamiento técnico – Cabaret", cost: 4500 },
+          { category: "Equipamiento técnico – Zona bar", cost: 1500 },
+          { category: "Instalación eléctrica", cost: 6500 },
+          { category: "Lavado de cara zona bar", cost: 2000 },
+          { category: "Branding Casa Rosita", cost: 1500 },
+        ];
+
+        const margin = { top: 20, right: 30, bottom: 150, left: 60 };
+        const width = 800 - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+
+        const svg = d3
+          .select("#budget-chart")
+          .append("svg")
+          .attr(
+            "viewBox",
+            `0 0 ${width + margin.left + margin.right} ${
+              height + margin.top + margin.bottom
+            }`
+          )
+          .attr("preserveAspectRatio", "xMidYMid meet")
+          .append("g")
+          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x = d3
+          .scaleBand()
+          .range([0, width])
+          .domain(budgetData.map((d) => d.category))
+          .padding(0.2);
+
+        const y = d3
+          .scaleLinear()
+          .domain([0, d3.max(budgetData, (d) => d.cost) * 1.1])
+          .range([height, 0]);
+
+        svg
+          .append("g")
+          .attr("transform", `translate(0,${height})`)
+          .call(d3.axisBottom(x))
+          .selectAll("text")
+          .attr("transform", "translate(-10,0)rotate(-45)")
+          .style("text-anchor", "end")
+          .style("fill", "#FFFFFF"); // Blanco para el texto del gráfico
+
+        svg
+          .append("g")
+          .call(d3.axisLeft(y).tickFormat((d) => `${d}€`))
+          .selectAll("text")
+          .style("fill", "#FFFFFF"); // Blanco para el texto del gráfico
+
+        svg
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0 - margin.left)
+          .attr("x", 0 - height / 2)
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .style("fill", "#FFFFFF") // Blanco para el texto del gráfico
+          .text("Costo (€)");
+
+        svg
+          .selectAll("mybar")
+          .data(budgetData)
+          .enter()
+          .append("rect")
+          .attr("x", (d) => x(d.category))
+          .attr("y", (d) => y(d.cost))
+          .attr("width", x.bandwidth())
+          .attr("height", (d) => height - y(d.cost))
+          .attr("fill", "#FF69B4") // Rosita Pink
+          .on("mouseover", function (event, d) {
+            d3.select(this).attr("fill", "#FFD700"); // Rosita Gold al pasar el ratón
+            // Mostrar tooltip
+            tooltip
+              .style("opacity", 1)
+              .html(`Categoría: ${d.category}<br>Costo: ${d.cost}€`)
+              .style("left", event.pageX + 10 + "px")
+              .style("top", event.pageY - 28 + "px");
+          })
+          .on("mouseout", function () {
+            d3.select(this).attr("fill", "#FF69B4"); // Volver a Rosita Pink
+            tooltip.style("opacity", 0);
+          });
+
+        const tooltip = d3
+          .select("body")
+          .append("div")
+          .attr("class", "tooltip");
+      });
+    </script>
+  </body>
+</html>
